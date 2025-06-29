@@ -29,6 +29,8 @@ shadow.appendChild(img); //adds the idle pet into the container
 document.body.appendChild(container); //this creates the container into the webpage
 
 
+let diagnosticMode = false; //diagnostic mode; prints information if set to true
+
 //add event listener for when the user clicks on the image
 //add event listener for when the user tries to drag the pet
 img.addEventListener('dragend', drag_pet); 
@@ -105,23 +107,23 @@ function pet_image_src(speed, direction) { //function used to change the pet ima
     switch (speed) {
         case 'idle':
             source = `images/${pet}/${pet}_idle_8fps.gif`;
-            console.log('idle');
+            diagnosticPrint('idle');
             break;
         case 'walk':
             source = `images/${pet}/${pet}_walk_8fps.gif`;
-            console.log('walk');
+            diagnosticPrint('walk');
             break;
         case 'run':
             source = `images/${pet}/${pet}_run_8fps.gif`;
-            console.log('run');
+            diagnosticPrint('run');
             break;
         case 'fast':
             source = `images/${pet}/${pet}_walk_fast_8fps.gif`;
-            console.log('fast');
+            diagnosticPrint('fast');
             break;
         case 'swipe':
             source = `images/${pet}/${pet}_swipe_8fps.gif`;
-            console.log('swipe');
+            diagnosticPrint('swipe');
             break;
         default:
             console.log("Returning to default!");
@@ -131,11 +133,11 @@ function pet_image_src(speed, direction) { //function used to change the pet ima
     
     if (direction == 'left') {
         img.style.transform = 'scaleX(-1)';
-        console.log('left');
+        diagnosticPrint('left');
     }
     else if (direction == 'right') {
         img.style.transform = 'scaleX(1)';
-        console.log('right');
+        diagnosticPrint('right');
     }
 }
 
@@ -147,5 +149,53 @@ function pet_image_move(speed, direction) { //function used to move the pet imag
 
     let movement_speed;
 
-    switch (speed) 
+    switch (speed) {
+        case 'walk':
+            movement_speed = 0.8;
+            break;
+        case 'fast':
+            movement_speed = 1.5;
+            break;
+        case 'run':
+            movement_speed = 2.5;
+            break;
+    }
+
+    pet_image_src(speed, direction); //changes the image based on the speed and direction
+
+    let current_position = parseInt(img.style.right, 10);
+
+    const random = Math.floor(Math.random() * 300) + 100; //sets a random distance for the image to move
+
+    let counter = 0;
+
+    let my_interval = setInterval(() => {
+        if (direction == 'left') {
+            current_position += movement_speed;
+            diagnosticPrint(`The initial right: ${img.style.right}`);
+            img.style.right = `${current_position}px`;
+            diagnosticPrint(`The final right: ${img.style.right}`);
+        } else if (direction == 'right') {
+            current_position -= movement_speed;
+            img.style.right = `${current_position}px`;
+        }
+
+        if (reached_edge()) {
+            if (direction == 'left') {
+                direction = 'right';
+                diagnosticPrint('Reached left edge, changing direction to right');
+            } else if (direction == 'right') {
+                direction = 'left';
+                diagnosticPrint('Reached right edge, changing direction to left');
+            }
+            pet_image_src(speed, direction);
+        }
+    }) //work in progress
+}
+
+
+function diagnosticPrint(content) {
+    if (diagnosticMode) {
+        console.log(content);
+    }
 }
