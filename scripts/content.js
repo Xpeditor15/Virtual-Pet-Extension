@@ -41,9 +41,11 @@ let bottom_value;
 let dropping = 0; //checks if the pet is dropping
 let action = false; //checks if the user is performing any actions
 let is_moving = false; //checks if the pet is performing any action (idle, walk, run, etc.)
-let direction; //global variable for direction of pet
-let speed = 'idle'; //global variable for speed of pet
+let global_direction; //global variable for direction of pet
+let global_speed = 'idle'; //global variable for speed of pet
 
+
+//Check functions
 function check_position(event) { //checks if the img has went out of the viewport when the user drags the pet
     let max_left = 20;
     let max_right = document.documentElement.clientWidth - 20;
@@ -67,40 +69,7 @@ function reached_edge() { //checks if the img has went out of the viewport when 
 } //function returns true if the pet has reached the edge of the viewport
 
 
-function drag_pet(event) { //allows the user to drag the pet around the viewport
-    action = true;
-
-    if (!check_position(event)) {
-        event.preventDefault();
-        action = false;
-        return;
-    }
-
-    from_right = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
-    from_bottom = document.documentElement.clientHeight - event.clientY - img.height / 2.5;
-    event.target.style.right = `${from_right}px`;
-    event.target.style.bottom = `${from_bottom}px`;
-
-    if (dropping == 0) {
-        dropping = 1;
-        pet_drop(event.target);
-    }
-}
-
-
-function pet_drop(image) { //function called when the user releases the pet after picking it
-    const my_interval = setInterval(() => {
-        bottom_value = parseInt(image.style.bottom, 10);
-        if (bottom_value < 15) {
-            dropping = 0;
-            action = false;
-            clearInterval(my_interval);
-        }
-        image.style.bottom = `${bottom_value - 5}px`;
-    }, 50);
-}
-
-
+//Functions for setting the pet image
 function pet_image_src(speed, direction) { //function used to change the pet image based on speed and direction
     let source;
     
@@ -190,8 +159,115 @@ function pet_image_move(speed, direction) { //function used to move the pet imag
             }
             pet_image_src(speed, direction);
         }
-    }) //work in progress
+
+        counter++;
+        diagnosticPrint(`Moving`);
+        global_speed = `${speed}`; //updates the global speed variable
+        global_direction = `${direction}`; //updates the global direction variable
+
+        if (counter >= random) {
+            diagnosticPrint(`Reached random limit, stopping movement`);
+            clearInterval(my_interval);
+            pet_image_src('idle', direction);
+            diagnosticPrint('Pet moved!');
+        };
+    }, 50);
 }
+
+
+//User interaction functions
+function drag_pet(event) { //allows the user to drag the pet around the viewport
+    action = true;
+
+    if (!check_position(event)) {
+        event.preventDefault();
+        action = false;
+        return;
+    }
+
+    from_right = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
+    from_bottom = document.documentElement.clientHeight - event.clientY - img.height / 2.5;
+    event.target.style.right = `${from_right}px`;
+    event.target.style.bottom = `${from_bottom}px`;
+
+    if (dropping == 0) {
+        dropping = 1;
+        pet_drop(event.target);
+    }
+}
+
+
+function pet_drop(image) { //function called when the user releases the pet after picking it
+    const my_interval = setInterval(() => {
+        bottom_value = parseInt(image.style.bottom, 10);
+        if (bottom_value < 15) {
+            dropping = 0;
+            action = false;
+            clearInterval(my_interval);
+        }
+        image.style.bottom = `${bottom_value - 5}px`;
+    }, 50);
+}
+
+
+function pet_swipe() {
+    action = true;
+    const random = Math.floor(Math.random() * 2);
+    
+    if (!direction) {
+        direction = 'left';
+    }
+    let direction = 'left';
+    if (random == 1) direction = 'right';
+
+    pet_image_src('swipe', direction);
+    setTimeout(() => {
+        pet_image_src('idle', direction);
+        action = false;
+    }, 3600); //this delay is specific for deno
+}
+
+pet_image_move('run', 'right');
+
+
+//Random movement function
+function pet_random_movement() {
+    is_moving = true;
+    
+    let random_speed = Math.floor(Math.random() * 100);
+    let random_direction = Math.floor(Math.random() * 100);
+
+    let idle, walk, fast, run;
+    
+    if (global_speed == 'idle') {
+        idle = 60;
+        walk = 80;
+        fast = 90;
+        run = 100;
+    } else if (global_speed == 'walk') {
+        idle = 40;
+        walk = 80;
+        fast = 90;
+        run = 100;
+    } else if (global_speed == 'fast') {
+        idle = 10;
+        walk = 30;
+        fast = 80;
+        run = 100;
+    } else if (global_speed == 'run') {
+        idle = 10;
+        walk = 20;
+        fast = 80;
+        run = 100;
+    }
+
+    if 
+    
+    if (random_speed < idle) {
+        
+    }
+}
+
 
 
 function diagnosticPrint(content) {
