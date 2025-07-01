@@ -29,11 +29,13 @@ shadow.appendChild(img); //adds the idle pet into the container
 document.body.appendChild(container); //this creates the container into the webpage
 
 
-let diagnosticMode = false; //diagnostic mode; prints information if set to true
+let diagnosticMode = true; //diagnostic mode; prints information if set to true
 
 //add event listener for when the user clicks on the image
 //add event listener for when the user tries to drag the pet
 img.addEventListener('dragend', drag_pet); 
+img.addEventListener('click', pet_swipe);
+
 
 let from_right;
 let from_bottom;
@@ -175,6 +177,87 @@ function pet_image_move(speed, direction) { //function used to move the pet imag
 }
 
 
+function async_pet_image_move(speed, direction) {
+    return new Promise((resolve, reject) => {
+        if (is_moving) {
+            reject('Pet is already moving');
+            return;
+        }
+        
+        is_moving = true;
+        pet_image_move(speed, direction);
+        
+        setTimeout(() => {
+            is_moving = false;
+            resolve(`Pet moved to ${direction} at speed ${speed}`);
+        }, 3000); // Adjust the timeout based on the expected duration of the movement
+
+        if (action === true) {
+            reject('Action already in progress');
+            return;
+        }
+
+        let movement_speed;
+
+        switch (speed) {
+            case 'walk':
+                movement_speed = 0.8;
+                break;
+            case 'fast':
+                movement_speed = 1.5;
+                break;
+            case 'run':
+                movement_speed = 2.5;
+                break;
+        }
+
+        pet_image_src(speed, direction); //changes the image based on the speed and direction
+
+        let current_position = parseInt(img.style.right, 10);
+
+        const random_distance = Math.floor(Math.random() * 300) + 100;
+
+        let counter = 0;
+
+        let my_interval = setInterval(() => {
+            if (direction == 'left') {
+                current_position += movement_speed;
+                diagnosticPrint(`The initial right: ${img.style.right}`);
+                img.style.right = `${current_position}px`;
+                diagnosticPrint(`The final right: ${img.style.right}`);
+            } else if (direction == 'right') {
+                current_position -= movement_speed;
+                diagnosticPrint(`The initial right: ${img.style.right}`);
+                img.style.right = `${current_position}px`;
+                diagnosticPrint(`The final right: ${img.style.right}`);
+            }
+
+            if (reached_edge()) {
+                if (direction == 'left') {
+                    direction = 'right';
+                    diagnosticPrint('Reached left edge, changing direction to right');
+                } else if (direction == 'right') {
+                    direction = 'left';
+                    diagnosticPrint('Reached right edge, changing direction to left');
+                }
+                pet_image_src(speed, direction);
+            }
+
+            counter++;
+            diagnosticPrint(`Moving`);
+            global_speed = `${speed}`; //updates the global speed variable
+            global_direction = `${direction}`; //updates the global direction variable
+
+            if (counter >= random_distance) {
+                diagnosticPrint(`Reached random limit, stopping movement`);
+                clearInterval(my_interval);
+                resolve(`Pet moved to ${direction} at speed ${speed}`);
+            }
+        }, 50);
+    });
+}
+
+
 //User interaction functions
 function drag_pet(event) { //allows the user to drag the pet around the viewport
     action = true;
@@ -227,7 +310,11 @@ function pet_swipe() {
     }, 3600); //this delay is specific for deno
 }
 
-pet_image_move('run', 'right');
+//pet_image_move('run', 'right');
+async_pet_image_move('run', 'right').then((message) => {
+    diagnosticPrint("Finished");
+    diagnosticPrint(message);
+})
 
 
 //Random movement function
@@ -238,6 +325,7 @@ function pet_random_movement() {
     let random_direction = Math.floor(Math.random() * 100);
 
     let idle, walk, fast, run;
+    let direction;
     
     if (global_speed == 'idle') {
         idle = 60;
@@ -261,11 +349,34 @@ function pet_random_movement() {
         run = 100;
     }
 
-    if 
-    
+    let speed;
+
     if (random_speed < idle) {
-        
+        speed = 'idle';
+    } else if (random_speed < walk) {
+        speed = 'walk';
+    } else if (random_speed < fast) {
+        speed = 'fast';
+    } else if (random_speed < run) {
+        speed = 'run';
     }
+
+    global_speed = speed; //updates the global speed variable
+
+    if (global_direction == 'left') {
+        if (random_direction < 80) direction = 'left';
+        else direction = 'right';
+    } else if (global_direction == 'right') {
+        if (random_direction < 80) direction = 'right';
+        else direction = 'left';
+    }
+
+    global_direction = direction; //updates the global direction variable
+    
+    pet_image_move(speed, direction);
+    diagnosticPrint(`Pet is ${speed} to ${direction}`);
+
+    is_moving = false;
 }
 
 
