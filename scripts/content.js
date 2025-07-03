@@ -6,7 +6,7 @@ container.id = 'virtual-pet-container';
 container.style.top = '0px';
 container.style.left = '0px';
 container.style.height = '100vh';
-container.style.widows = '100vw';
+container.style.width = '100vw';
 const shadow = container.attachShadow({mode: "open"}); //creates a shadow container for the image
 
 
@@ -43,7 +43,7 @@ let bottom_value;
 let dropping = 0; //checks if the pet is dropping
 let action = false; //checks if the user is performing any actions
 let is_moving = false; //checks if the pet is performing any action (idle, walk, run, etc.)
-let global_direction; //global variable for direction of pet
+let global_direction = 'right'; //global variable for direction of pet
 let global_speed = 'idle'; //global variable for speed of pet
 
 
@@ -59,8 +59,8 @@ function check_position(event) { //checks if the img has went out of the viewpor
 
 
 function reached_edge() { //checks if the img has went out of the viewport when the pet is moving by itself
-    let max_left = 20;
-    let max_right = document.documentElement.clientWidth - 20;
+    let max_left = 40;
+    let max_right = document.documentElement.clientWidth - 40;
     let max_top = 20;
     let max_bottom = document.documentElement.clientHeight - 20;
 
@@ -176,13 +176,18 @@ function pet_image_move(speed, direction) { //function used to move the pet imag
     }, 50);
 }
 
-
+/*
 function async_pet_image_move(speed, direction) {
     return new Promise((resolve, reject) => {
         if (is_moving) {
+            diagnosticPrint("Pet is already moving");
             reject('Pet is already moving');
             return;
+        } else if (!is_moving) {
+            diagnosticPrint("Pet is not moving yet");
         }
+
+        is_moving = true;
         
         is_moving = true;
         pet_image_move(speed, direction);
@@ -250,12 +255,13 @@ function async_pet_image_move(speed, direction) {
 
             if (counter >= random_distance) {
                 diagnosticPrint(`Reached random limit, stopping movement`);
+                is_moving = false;
                 clearInterval(my_interval);
                 resolve(`Pet moved to ${direction} at speed ${speed}`);
             }
         }, 50);
     });
-}
+}*/
 
 
 //User interaction functions
@@ -297,24 +303,24 @@ function pet_swipe() {
     action = true;
     const random = Math.floor(Math.random() * 2);
     
-    if (!direction) {
-        direction = 'left';
+    if (!global_direction) {
+        global_direction = 'left';
     }
-    let direction = 'left';
-    if (random == 1) direction = 'right';
+    let global_direction = 'left';
+    if (random == 1) global_direction = 'right';
 
-    pet_image_src('swipe', direction);
+    pet_image_src('swipe', global_direction);
     setTimeout(() => {
-        pet_image_src('idle', direction);
+        pet_image_src('idle', global_direction);
         action = false;
     }, 3600); //this delay is specific for deno
 }
 
 //pet_image_move('run', 'right');
-async_pet_image_move('run', 'right').then((message) => {
+/*async_pet_image_move('run', 'right').then((message) => {
     diagnosticPrint("Finished");
     diagnosticPrint(message);
-})
+})*/
 
 
 //Random movement function
@@ -378,6 +384,217 @@ function pet_random_movement() {
 
     is_moving = false;
 }
+
+/*
+function async_pet_random_movement() {
+    return new Promise((resolve, reject) => {
+        //is_moving = true;
+        diagnosticPrint("is_moving set to true");
+
+        let random_speed = Math.floor(Math.random() * 100);
+        let random_direction = Math.floor(Math.random() * 100);
+
+        let idle, walk, fast, run;
+        let direction;
+
+        const speedSettings = {
+            idle: [60, 80, 90, 100],
+            walk: [40, 80, 90, 100],
+            fast: [10, 30, 80, 100],
+            run: [10, 20, 80, 100]
+        }
+
+        const speedArray = speedSettings[global_speed] || speedSettings['idle'];
+        let speedIndex = speedArray.findIndex((s) => random_speed < s);
+        const speeds = ['idle', 'walk', 'fast', 'run'];
+        
+        if (speedIndex === -1) {
+            reject('Invalid speed index');
+            return;
+        }
+        
+        let speed = speeds[speedIndex];
+
+        global_speed = speed; 
+
+        direction = (random_direction < 80) ? global_direction : (global_direction === 'left' ? 'right' : 'left');
+        global_direction = direction;
+
+        async_pet_image_move(speed, direction).then(() => {
+            is_moving = false;
+            diagnosticPrint(`is_moving set to false`);
+            resolve(`Pet moved to ${direction} at speed ${speed}`);
+        })
+    })
+}
+
+setInterval(() => {
+    if (!is_moving) {
+        diagnosticPrint("Pet is not moving");
+        async_pet_random_movement().then((message) => {
+            diagnosticPrint("Finished random movement");
+            diagnosticPrint(message);
+        })
+    } else {
+        diagnosticPrint("is_moving is true");
+    }
+}, 50);*/
+
+
+
+//New movement functions
+function async_pet_image_move(speed, direction) {
+    return new Promise((resolve, reject) => {
+        /*
+        if (is_moving || action) {
+            diagnosticPrint("is_moving or action is true in pet_move");
+            reject("is_moving or action is true in pet_move");
+            return;
+        } else {
+            diagnosticPrint("is_moving and action are false in pet_move");
+        }
+        */
+
+        is_moving = true; //sets is_moving to true to prevent executing it again
+
+        const speedSettings = {
+            idle: 0,
+            walk: 0.8,
+            fast: 1.5,
+            run: 2.5
+        }
+
+        let movement_speed = speedSettings[speed] || speedSettings['idle']; //sets the default speed to walk, if the speed is not defined
+
+        pet_image_move(speed, direction);
+
+        let current_position = parseInt(img.style.right, 10);
+
+        const random_distance = Math.floor(Math.random() * 300) + 100;
+
+        let counter = 0;
+        
+        let my_interval = setInterval(() => {
+            if (direction == 'left') {
+                current_position += movement_speed;
+                diagnosticPrint(`The initial right: ${img.style.right}`);
+                img.style.right = `${current_position}px`;
+                diagnosticPrint(`The final right: ${img.style.right}`);
+            } else if (direction == 'right') {
+                current_position -= movement_speed;
+                diagnosticPrint(`The initial right: ${img.style.right}`);
+                img.style.right = `${current_position}px`;
+                diagnosticPrint(`The final right: ${img.style.right}`);
+            }
+            
+            if (reached_edge()) {
+                if (direction == 'left') {
+                    direction = 'right';
+                    diagnosticPrint('Reached left edge, changing direction to right');
+                } else if (direction == 'right') {
+                    direction = 'left';
+                    diagnosticPrint('Reached right edge, changing direction to left');
+                }
+                pet_image_src(speed, direction);
+            }
+
+            counter++;
+            diagnosticPrint(`Moving`);
+            global_speed = `${speed }`; //updates the global speed variable
+            global_direction = `${direction}`; //updates the global direction variable
+
+            if (counter >= random_distance) {
+                diagnosticPrint(`Set is_moving to false`);
+                is_moving = false;
+                clearInterval(my_interval);
+                resolve(`Pet moved to ${direction} at speed ${speed}`);
+            }
+        }, 50);
+    })
+}
+
+
+function async_pet_random_movement() {
+    return new Promise((resolve, reject) => {
+        if (is_moving) {
+            diagnosticPrint("Pet is already moving");
+            reject("Pet is already moving, is_moving is true");
+            return;
+        }
+
+        is_moving = true;
+
+        diagnosticPrint("is_moving is false, starting random movement");
+
+        let random_speed = Math.floor(Math.random() * 100);
+        let random_direction = Math.floor(Math.random() * 100);
+
+        const speedSettings = {
+            idle: [60, 80, 90, 100],
+            walk: [40, 80, 90, 100],
+            fast: [20, 70, 85, 100],
+            run: [10, 70, 85, 100]
+        }
+
+        const speedArray = speedSettings[global_speed] || speedSettings['idle'];
+        let speedIndex = speedArray.findIndex((s) => random_speed < s);
+        const speeds = ['idle', 'walk', 'fast', 'run'];
+
+        if (speedIndex === -1) {
+            reject('Invalid speed index');
+            return;
+        }
+
+        let speed = speeds[speedIndex];
+
+        global_speed = speed;
+
+        direction = (random_direction < 80) ? global_direction : (global_direction === 'left' ? 'right' : 'left');
+        global_direction = direction;
+
+        async_pet_image_move(speed, direction).then(() => {
+            diagnosticPrint("Finished random movement");
+            diagnosticPrint(`is_moving is now set to ${is_moving}`);
+            resolve(`Pet moved to ${direction} at speed ${speed}`);
+    })
+})
+}
+
+
+/*setInterval(() => {
+    if (!is_moving) {
+        diagnosticPrint("is_moving is false in interval");
+        async_pet_random_movement().then(() => {
+            diagnosticPrint("Finished random movement in interval");
+        })
+    } else {
+        diagnosticPrint("is_moving is true in interval");
+    }
+}, 50);
+
+setInterval(() => {
+    async_pet_random_movement().then(() => {
+        diagnosticPrint("Finished random movement in interval");
+    }).catch((error) => {
+        diagnosticPrint("Random movement failed: " + error);
+    })
+}, 5000);*/
+
+function startLoop() {
+    async_pet_random_movement().then(() => {
+        diagnosticPrint("Started random movement loop");
+        startLoop();
+    }).catch((error) => {
+        diagnosticPrint("Random movement loop failed: " + error);
+        setTimeout(() => {
+            startLoop();
+        }, timeout = 5000); //waits 5 seconds before trying again
+    })
+}
+
+startLoop();
+
+
 
 
 
