@@ -41,7 +41,7 @@ let diagnosticMode = true;
 let from_right;
 let from_bottom;
 let bottom_value;
-let dropping = 0; //checks if the pet is dropping;
+let dropping = false; //checks if the pet is dropping;
 let action = false; //checks if the user is performing any actions
 let is_moving = false; //checks if the pet is moving at the moment
 let global_direction = 'right';
@@ -100,3 +100,19 @@ function set_pet_image() { //sets the pet image based on global_speed and global
 }
 
 
+function pet_image_move() { //moves the pet image based on global speed and direction
+    
+}
+
+
+
+//Functions for user actions
+function pet_drop(image) {
+    const my_interval = setInterval(() => {
+        bottom_value = parseInt(image.style.bottom, 10);
+        if (bottom_value < 15) {
+            dropping = false;
+            
+        }
+    }, 50);
+}
