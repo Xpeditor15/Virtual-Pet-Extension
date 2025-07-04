@@ -101,7 +101,25 @@ function set_pet_image() { //sets the pet image based on global_speed and global
 
 
 function pet_image_move() { //moves the pet image based on global speed and direction
-    
+    return new Promise((resolve, reject) => {
+        const speedSettings = {
+            idle: 0, 
+            swipe: 0, 
+            walk: 0.8, 
+            fast: 1.5,
+            run: 2.5
+        }
+
+        const speed = speedSettings.global_speed
+
+        if (!speed) {
+            global_speed = 'idle';
+            speed = speedSettings.global_speed
+        }
+
+        
+
+    })
 }
 
 
