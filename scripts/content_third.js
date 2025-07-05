@@ -47,6 +47,10 @@ let is_moving = false; //checks if the pet is moving at the moment
 let global_direction = 'right';
 let global_speed = 'idle';
 
+const global_interrupts = {
+    swipe: false,
+    drop: false
+}
 
 
 //Check functions
@@ -70,6 +74,18 @@ function reached_edge() {  //checks if the img has went out of the viewport when
 
     if (rect.left < max_left || rect.left > max_right || rect.top < max_top || rect.top > max_bottom) return true;
     return false;
+}
+
+
+function check_interrupts() { //returns an array of active interrupts. if none, returns an empty array
+    let active_interrupts = [];
+    Object.entries(global_interrupts).forEach(([key, value]) => {
+        if (value) {
+            active_interrupts.push(key);
+        } 
+    });
+    
+    return active_interrupts;
 }
 
 
@@ -130,7 +146,14 @@ function pet_drop(image) {
         bottom_value = parseInt(image.style.bottom, 10);
         if (bottom_value < 15) {
             dropping = false;
-            
+            action = false;
+            clearInterval(my_interval);
         }
+        image.style.bottom = `${bottom_value - 5}px`;
     }, 50);
+}
+
+
+function pet_swipe() {
+    action = true;
 }
