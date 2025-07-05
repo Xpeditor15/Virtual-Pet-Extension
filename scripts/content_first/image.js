@@ -9,7 +9,7 @@ function set_pet_image() {
 
     let source = pet_images[global_speed];
     if (!source) {
-        global_speed = 'idle';
+        global_speed = 'idle'; //sets global_speed to idle if the speed is undefined
         source = pet_images['idle'];
     }
 
@@ -20,31 +20,4 @@ function set_pet_image() {
     } else if (global_direction === 'right') {
         img.style.transform = 'scaleX(1)'; // flips the image to the right
     }
-}
-
-
-
-function pet_drop() {
-    global_interrupts.drop = true;
-
-    const my_interval = setInterval(() => {
-        bottom_value = parseInt(img.style.bottom, 10);
-        if (bottom_value < 15) {
-            global_interrupts.drop = false;
-            clearInterval(my_interval);
-        }
-    }, 50);
-}
-
-
-function pet_swipe() {
-    global_interrupts.swipe = true;
-
-    global_speed = 'swipe';
-    set_pet_image();
-    setTimeout(() => {
-        global_speed = 'idle';
-        set_pet_image();
-        global_interrupts.swipe = false;
-    }, 3600);
 }
