@@ -7,6 +7,7 @@ const pets = {
 
 let user_choice = 'deno';
 
+
 let pet = pets[user_choice]['name'] || pets['deno']['name']; //selects deno by default
 
 
@@ -41,14 +42,13 @@ document.body.appendChild(container); //this creates the container into the page
 let diagnosticMode = true; //Set to true to enable diagnostic messages
 
 
-img.addEventListener('dragstart', testPrint);
-
+//add event listeners
 img.addEventListener('dragend', (event) => {
     global_interrupts.drop = true;
     diagnosticPrint(`Drag ended`);
+    pet_drag(event);
 })
-
-img.addEventListener('click', (event) => {
+img.addEventListener('click', () => {
     global_interrupts.swipe = true;
     diagnosticPrint(`Pet clicked`);
     pet_swipe();
@@ -58,12 +58,12 @@ img.addEventListener('click', (event) => {
 let from_right;
 let from_bottom;
 let bottom_value;
-let dropping = false; //checks if the pet is dropping;
+let is_dropping = false;
 let global_action = false; //checks if the pet is performing an interrupt action
 let global_direction = 'right';
 let global_speed = 'idle';
 
-const global_interrupts = {
+let global_interrupts = {
     swipe: false,
     drop: false
 }
@@ -73,9 +73,4 @@ function diagnosticPrint(content) {
     if (diagnosticMode) {
         console.log(content);
     }
-}
-
-
-function testPrint() {
-    console.log(`This si a test print function`);
 }

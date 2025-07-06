@@ -8,9 +8,11 @@ function set_pet_image() {
     };
 
     let source = pet_images[global_speed];
+    diagnosticPrint(`image.js line 11: Source: ${source}`);
     if (!source) {
         global_speed = 'idle'; //sets global_speed to idle if the speed is undefined
         source = pet_images['idle'];
+        diagnosticPrint(`image.js line 14: Defaulting to idle`);
     }
 
     img.src = chrome.runtime.getURL(source);

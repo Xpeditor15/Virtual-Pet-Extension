@@ -1,12 +1,5 @@
 function pet_move(distance) {
     return new Promise((resolve, reject) => {
-        if (check_interrupts().length > 0) { // check if interrupts are detected
-            const first_interrupt = check_interrupts()[0]; // get the first active interrupt detected
-            //process_interrupts(first_interrupt); // process the interrupt
-            reject(`movement.js line 6: Interrupt detected: ${first_interrupt}`);
-            return;
-        }
-
         const speedSettings = {
             idle: 0,
             swipe: 0,
@@ -15,21 +8,19 @@ function pet_move(distance) {
             run: 2
         }
 
-        diagnosticPrint(`movement.js line 18: global_speed: ${global_speed}`);
+        diagnosticPrint(`movement.js line 11: global_speed: ${global_speed}`);
 
         let speed = speedSettings[global_speed];
-
-        diagnosticPrint(`movement.js line 22: speed: ${speed}`);
 
         if (speed === undefined) {
             global_speed = 'idle';
             speed = speedSettings[global_speed];
-            diagnosticPrint(`movement.js line 27: Defaulting speed to idle`);
+            diagnosticPrint(`movement.js line 18: Defaulting speed to idle`);
         }
 
         set_pet_image();
 
-        let current_position = parseInt(img.style.right, 10);
+        let current_position;
 
         let counter = 0;
 
@@ -37,35 +28,33 @@ function pet_move(distance) {
             if (reached_edge()) {
                 global_direction = global_direction === 'left' ? 'right' : 'left';
                 set_pet_image();
-                diagnosticPrint(`movement.js line 40: Reached edge, changing direction to ${global_direction}`);
+                diagnosticPrint(`movement.js line 31: Reached edge, changing direction to ${global_direction}`);
             }
-
+            
             if (check_interrupts().length > 0) {
                 const first_interrupt = check_interrupts()[0];
-                diagnosticPrint(`movement.js line 45: Interrupt detected: ${first_interrupt}`);
-                //process_interrupts(first_interrupt);
-                clearInterval(my_interval);
-                diagnosticPrint('movement.js cancel movement');
-                reject(`movement.js line 48: Interrupt detected: ${first_interrupt}`);
-                return;
-            } 
-            
-            diagnosticPrint(`movement.js line 52: Global direction: ${global_direction}`);
-
-            
-            if (global_direction === 'left') {
-                current_position += speed;
-                img.style.right = `${current_position}px`;
-            } else if (global_direction === 'right') {
-                current_position -= speed;
-                img.style.right = `${current_position}px`;
+                diagnosticPrint(`movement.js line 53: Interrupt detected: ${first_interrupt}`);
             }
 
-            counter++;
+            if (!global_action) {
+                current_position = parseInt(img.style.right, 10);
+                if (global_direction === 'left') {
+                    current_position += speed;
+                    img.style.right = `${current_position}px`;
+                } else {
+                    current_position -= speed;
+                    img.style.right = `${current_position}px`;
+                }
+
+                counter++;
+            }
+
             if (counter >= distance) {
                 clearInterval(my_interval);
-                resolve(`movement.js line 65: Completed movement`);
+                resolve(`movement.js line 47: Completed movement`);
             }
+
+            
         }, 50);
     })
 }
@@ -75,21 +64,14 @@ function random_movement() {
     return new Promise((resolve, reject) => {
         if (check_interrupts().length > 0) {
             const first_interrupt = check_interrupts()[0];
-            //process_interrupts(first_interrupt);
-            reject(`movement.js line 77: Interrupt detected: ${first_interrupt}`);
-            return;
+            diagnosticPrint(`movement.js line 64: Interrupt detected: ${first_interrupt}`);
         }
-
-        /*if (global_action) {
-            reject(`Action in progress`);
-            return;
-        }*/
 
         let random_speed = Math.floor(Math.random() * 100);
         let random_direction = Math.floor(Math.random() * 100);
 
         const speedSettings = {
-            idle: [20, 80, 90, 100],
+            idle: [20, 80, 90, 100], // Adjusted for more running, default is 60 instead of 20
             walk: [40, 80, 90, 100],
             fast: [20, 70, 85, 100],
             run: [10, 70, 85, 100]
@@ -106,19 +88,19 @@ function random_movement() {
         let speed = speeds[speedIndex];
         global_speed = speed;
 
-        diagnosticPrint(`movement.js line 102: global_speed: ${global_speed}`);
+        diagnosticPrint(`movement.js line 88: global_speed: ${global_speed}`);
 
-        direction = (random_direction < 80) ? global_direction : (global_direction === 'left' ? 'right' : 'left');
+        let direction = (random_direction < 80) ? global_direction : (global_direction === 'left' ? 'right' : 'left');
         global_direction = direction;
 
         const random_distance = Math.floor(Math.random() * 300) + 100;
 
         pet_move(random_distance).then((result) => {
-            diagnosticPrint(`movement.js line 110: Finished random movement`);
+            diagnosticPrint(`movement.js line 94: Finished random movement`);
             resolve(result);
         })
         .catch((error) => {
-            diagnosticPrint(`movement.js line 114: Error: ${error}`);
+            diagnosticPrint(`movement.js line 100: Error: ${error}`);
             reject(error);
         })
     })
