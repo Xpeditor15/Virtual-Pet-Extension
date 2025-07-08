@@ -31,16 +31,17 @@ img.alt = pet;
 img.src = chrome.runtime.getURL(`images/${pet}/${pet}_idle_8fps.gif`);
 img.id = 'virtual-pet-image';
 img.draggable = true;
-img.style.bottom = '10px';
-img.style.right = '400px';
+
+
+
+img.style.bottom = (document.documentElement.clientHeight - 50 - img.height / 2.5) + 'px';
+img.style.right = (document.documentElement.clientWidth - 50 - img.width / 2.5) + 'px';
 shadow.appendChild(img); //adds the idle pet into the container
 
 
 document.body.appendChild(container); //this creates the container into the page
 
-
 let diagnosticMode = true; //Set to true to enable diagnostic messages
-
 
 //add event listeners
 img.addEventListener('dragend', (event) => {

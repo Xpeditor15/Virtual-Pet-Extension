@@ -11,6 +11,7 @@ function pet_move(distance) {
         diagnosticPrint(`movement.js line 11: global_speed: ${global_speed}`);
 
         let speed = speedSettings[global_speed];
+        diagnosticPrint(`movement.js line 14: Speed set to ${speed}`);
 
         if (speed === undefined) {
             global_speed = 'idle';
@@ -20,11 +21,13 @@ function pet_move(distance) {
 
         set_pet_image();
 
-        let current_position;
+        let current_position = parseFloat(img.style.right);
 
         let counter = 0;
 
         let my_interval = setInterval(() => {
+            current_position = parseFloat(img.style.right);
+            diagnosticPrint(`movement.js line 30: Current position: ${current_position}`);
             if (reached_edge()) {
                 global_direction = global_direction === 'left' ? 'right' : 'left';
                 set_pet_image();
@@ -37,7 +40,7 @@ function pet_move(distance) {
             }
 
             if (!global_action) {
-                current_position = parseInt(img.style.right, 10);
+                //current_position = parseInt(img.style.right, 10);
                 if (global_direction === 'left') {
                     current_position += speed;
                     img.style.right = `${current_position}px`;
@@ -53,8 +56,6 @@ function pet_move(distance) {
                 clearInterval(my_interval);
                 resolve(`movement.js line 47: Completed movement`);
             }
-
-            
         }, 50);
     })
 }
@@ -118,4 +119,14 @@ async function movement_loop() {
     }
 }
 
-movement_loop();
+pet_drop(img);
+
+const my_interval = setInterval(() => {
+    bottom_value = parseFloat(img.style.bottom);
+    if (bottom_value < 15) {
+        setTimeout(() => {
+            movement_loop();
+        }, 1000);
+        clearInterval(my_interval);
+    }
+}, 50);

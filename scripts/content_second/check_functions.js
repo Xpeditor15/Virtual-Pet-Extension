@@ -10,13 +10,13 @@ function check_position(event) { //checks if image is still in viewport during u
 
 function reached_edge() { //checks if image is still in viewport during pet move
     let max_left = 5;
-    let max_righ = document.documentElement.clientWidth - 40;
+    let max_right = document.documentElement.clientWidth - 40;
     let max_top = 20;
     let max_bottom = document.documentElement.clientHeight - 20;
 
     let rect = img.getBoundingClientRect();
 
-    if (rect.left < max_left || rect.left > max_righ || rect.top < max_top || rect.top > max_bottom) return true;
+    if (rect.left < max_left || rect.left > max_right || rect.top < max_top || rect.top > max_bottom) return true;
     return false;
 }
 

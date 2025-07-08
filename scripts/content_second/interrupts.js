@@ -28,7 +28,7 @@ function pet_drop(event) {
     set_pet_image();
     
     const my_interval = setInterval(() => {
-        bottom_value = parseInt(event.style.bottom, 10);
+        bottom_value = parseFloat(event.style.bottom);
         diagnosticPrint(`interrupts.js line 32: Current bottom value: ${bottom_value}`);
         if (bottom_value < 15) {
             global_speed = temp_speed;
