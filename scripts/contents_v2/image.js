@@ -7,22 +7,17 @@ const petImages = {
 }
 
 
-function setImage() {
-    let source = petImages[petState.speed];
-
-    if (!source) {
-        petState.speed = 'idle';
-        source = petImages['idle'];
-        diagnosticPrint(`image.js line 16: Defaulting to idle image`);
-    } else {
-        diagnosticPrint(`image.js line 18: Source: ${source}`);
-    }
-
+function setImage(speed, direction) {
+    let source = petImages[speed] || petImages['idle'];
+    
+    diagnosticPrint(`images.js line 13: Source: ${source}`);
     img.src = chrome.runtime.getURL(source);
 
-    if (petState.direction === 'left') {
+    if (direction === 'left') {
         img.style.transform = 'scaleX(-1)';
-    } else if (petState.direction === 'right') {
+    } else if (direction === 'right') {
         img.style.transform = 'scaleX(1)';
+    } else {
+        diagnosticPrint(`images.js line 21: Invalid direction`);
     }
 }

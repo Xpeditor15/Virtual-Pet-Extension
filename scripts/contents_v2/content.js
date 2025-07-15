@@ -4,13 +4,14 @@ Features a more optimized approach compared to previous versions. Changes made i
 
 
 Features to be implemented:
-- Using a centralized state (petState object) to manage global variables
-- Replacing setInterval with requestAnimationFrame
-- Caching DOM elements to reduce repeated queries
-- Implement repeated animations and image-setting code to helpers
-- Optimize interrupt functions
-- Use CSS transforms for movement instead of updating direct style positions
+- Using a centralized state (petState object) to manage global variables (done)
+- Replacing setInterval with requestAnimationFrame (done)
+- Caching DOM elements to reduce repeated queries 
+- Implement repeated animations and image-setting code to helpers (done)
+- Optimize interrupt functions (done)
+- Use CSS transforms for movement instead of updating direct style positions (done)
 */
+
 
 const petList = {
     deno: {
@@ -19,9 +20,10 @@ const petList = {
     }
 }
 
+
 let userChoice = 'deno';
 
-let pet = petList[userChoice]['name'] || petList['deno']['name']; // sets the default pet to deno
+let pet = petList[userChoice]['name'] || petList['deno']['name']; // sets the default pet to deno if userChoice is undefined
 
 
 const container = document.createElement('div');
@@ -45,18 +47,35 @@ img.src = chrome.runtime.getURL(`images/${pet}/${pet}_idle_8fps.gif`);
 img.id = 'virtual-pet-image';
 img.draggable = true;
 
+const randomHeight = Math.random() * 0.6 + 0.2;
+const randomWidth = Math.random() * 0.6 + 0.2;
 
-shadow.appendChild(img); // adds the idle pet into the container
+img.style.bottom = `${document.documentElement.clientHeight * randomHeight}px`;
+img.style.right = `${document.documentElement.clientWidth * randomWidth}px`;
 
+setTimeout(() => {
+    shadow.appendChild(img);
+    document.body.appendChild(container);
+    img.style.visibility = 'visible'; // make the image visible after appending
+}, 500);
 
-document.body.appendChild(container); // this creates the container into the page
+//event listeners
+img.addEventListener('dragend', (event) => {
+    //globalInterrupts.drop = true;
+    diagnosticPrint(`content.js line 65: Drag ended`);
+    petDrag(event);
+})
 
-let diagnosticMode = true;
+img.addEventListener('click', () => {
+    globalInterrupts.swipe = true;
+    diagnosticPrint(`content.js line 71: Pet clicked`);
+    petSwipe();
+})
 
-//add event listeners
-//dragend
-//click
-//resize
+img.addEventListener('resize', () => {
+    updateViewport();
+    diagnosticPrint(`content.js line 77: Viewport updated`);
+})
 
 
 const diagnostics = {
@@ -70,7 +89,7 @@ const petState = {
     bottomValue: 0,
     isAction: false,
     direction: 'right',
-    speed: 'idle' 
+    speed: 'idle'
 }
 
 
