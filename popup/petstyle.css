@@ -15,8 +15,7 @@ html, body {
 
 #virtual-pet-image {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
     pointer-events: auto;
     z-index: 10000;
+    visibility: hidden;
 }

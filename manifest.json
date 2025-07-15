@@ -5,7 +5,7 @@
     "description": "Adds a pixel pet onto your website!",
     "content_scripts": [
         {
-            "js": ["scripts/content_second/content.js", "scripts/content_second/interrupts.js", "scripts/content_second/check_functions.js", "scripts/content_second/image.js", "scripts/content_second/movement.js"],
+            "js": ["scripts/contents_v3/content.js", "scripts/contents_v3/interrupts.js", "scripts/contents_v3/check_functions.js", "scripts/contents_v3/image.js", "scripts/contents_v3/movement.js", "scripts/contents_v3/helper.js"],
             "css": ["popup/petstyle.css"],
             "matches": ["<all_urls>"]
         }
