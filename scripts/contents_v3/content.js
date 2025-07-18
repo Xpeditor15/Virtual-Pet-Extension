@@ -46,10 +46,17 @@ img.style.bottom = `${document.documentElement.clientHeight * randomHeight}px`;
 img.style.right = `${document.documentElement.clientWidth * randomWidth}px`;
 
 
-//set tiemeout to add the image after a delay
-
+//set timeout to add the image after a delay
+setTimeout(() => {
+    shadow.appendChild(container);
+    document.body.appendChild(container);
+    img.style.visibility = 'visible';
+}, 500);
 
 //add event listeners, dragend, click, resize
+img.addEventListener('dragend', (event) => {
+    diagnosticPrint(`content.js line`)
+})
 
 
 const diagnostics = {
@@ -58,6 +65,8 @@ const diagnostics = {
 
 
 const petState = {
+    fromRight: 0,
+    fromBottom: 0,
     isAction: false,
     direction: 'right',
     speed: 'idle'
