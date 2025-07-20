@@ -48,14 +48,28 @@ img.style.right = `${document.documentElement.clientWidth * randomWidth}px`;
 
 //set timeout to add the image after a delay
 setTimeout(() => {
-    shadow.appendChild(container);
+    shadow.appendChild(img);
     document.body.appendChild(container);
     img.style.visibility = 'visible';
 }, 500);
 
+
 //add event listeners, dragend, click, resize
 img.addEventListener('dragend', (event) => {
-    diagnosticPrint(`content.js line`)
+    diagnosticPrint(`content.js line 58: Drag ended`);
+    petDrag(event);
+})
+
+
+img.addEventListener('click', () => {
+    diagnosticPrint(`content.js line 63: Pet clicked`);
+    petSwipe();
+})
+
+
+img.addEventListener('resize', () => {
+    diagnosticPrint(`content.js line 68: Image resized`);
+    updateViewport();
 })
 
 
@@ -84,3 +98,16 @@ function diagnosticPrint(message) {
         console.log(message);
     }
 }
+
+
+setTimeout(() => {
+    petState.isAction = true;
+    petDrop(img);
+    
+    const my_interval = setInterval(() => {
+        if (!petState.isAction) {
+            diagnosticPrint(`content.js line 109: Finish dropping initially`);
+            clearInterval(my_interval);
+        }
+    }, 50);
+}, 550);

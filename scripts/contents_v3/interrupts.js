@@ -29,14 +29,18 @@ function petDrag(event) { //called in event listener dragend
 
     petState.isAction = true;
 
-    //petState.fromRight = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
-    //petState.fromBottom = document.documentElement.clientHeight - event.clientY - img.height / 2.5;
+    petState.fromRight = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
+    petState.fromBottom = document.documentElement.clientHeight - event.clientY - img.height / 2.5;
 
+    const testRight = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
+    const testBottom = document.documentElement.clientHeight - event.clientY - img.width / 2.5;
+
+    diagnosticPrint(`interrupt.js line 38: testRight: ${testRight}, testBottom: ${testBottom}`);
     let rect = img.getBoundingClientRect();
 
-    const newRight = document.documentElement.clientWidth - rect.right;
-    const newBottom = document.documentElement.clientHeight - rect.bottom;
-    updatePosition(newBottom, newRight);
+    //const newRight = document.documentElement.clientWidth - rect.right;
+    //const newBottom = document.documentElement.clientHeight - rect.bottom;
+    //updatePosition(newBottom, newRight);
 
     event.target.style.right = `${petState.fromRight}px`; //sets the position of the image
     event.target.style.bottom = `${petState.fromBottom}px`;
@@ -45,8 +49,10 @@ function petDrag(event) { //called in event listener dragend
 
     if (!globalInterrupts.drop) {
         globalInterrupts.drop = true; //user dragged the image for the first time
+        diagnosticPrint(`interrupt.js: First time drag`);
         setTimeout(() => {
-            petDrop(event);
+            //petDrop(event);
+            diagnosticPrint(`interrupt.js: calls petDrop woohoo`);
         }, 30); //wait for 30ms before calling petDrop
     } else {
         if (dropAnimationId === undefined) {
@@ -80,6 +86,7 @@ function petDrop(event) {
 
         rect = img.getBoundingClientRect();
 
+        diagnosticPrint(`interrupt.js line 84: rect.bottom: ${rect.bottom}`);
         newRight = document.documentElement.clientWidth - rect.right;
         newBottom = document.documentElement.clientHeight - rect.bottom;
 
@@ -88,6 +95,8 @@ function petDrop(event) {
             globalInterrupts.drop = false;
             img.style.bottom = `${newBottom}px`, img.style.right = `${newRight}px`;
             updatePosition(newBottom, newRight);
+            diagnosticPrint(`interrupt.js line 92: Completed petDrop`);
+            return;
         } else {
             offset += dropSpeed * delta;
             img.style.transform = `translateY(${offset}px)`;
