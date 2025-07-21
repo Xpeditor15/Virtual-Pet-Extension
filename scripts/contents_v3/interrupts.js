@@ -29,34 +29,24 @@ function petDrag(event) { //called in event listener dragend
 
     petState.isAction = true;
 
-    petState.fromRight = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
-    petState.fromBottom = document.documentElement.clientHeight - event.clientY - img.height / 2.5;
+    const testRight = document.documentElement.clientWidth - event.clientX - img.width / 2;
+    const testBottom = document.documentElement.clientHeight - event.clientY - img.width / 2;
+    updatePosition(testBottom, testRight);
 
-    const testRight = document.documentElement.clientWidth - event.clientX - img.width / 2.5;
-    const testBottom = document.documentElement.clientHeight - event.clientY - img.width / 2.5;
-
-    diagnosticPrint(`interrupt.js line 38: testRight: ${testRight}, testBottom: ${testBottom}`);
-    let rect = img.getBoundingClientRect();
-
-    //const newRight = document.documentElement.clientWidth - rect.right;
-    //const newBottom = document.documentElement.clientHeight - rect.bottom;
-    //updatePosition(newBottom, newRight);
+    //diagnosticPrint(`interrupt.js line 36: testRight: ${testRight}, testBottom: ${testBottom}`);
 
     event.target.style.right = `${petState.fromRight}px`; //sets the position of the image
     event.target.style.bottom = `${petState.fromBottom}px`;
 
-    diagnosticPrint(`interrupt.js line 38: fromRight: ${petState.fromRight}, fromBottom: ${petState.fromBottom}`);
-
     if (!globalInterrupts.drop) {
         globalInterrupts.drop = true; //user dragged the image for the first time
-        diagnosticPrint(`interrupt.js: First time drag`);
+        diagnosticPrint(`interrupt.js 43: First time drag`);
         setTimeout(() => {
-            //petDrop(event);
-            diagnosticPrint(`interrupt.js: calls petDrop woohoo`);
+            petDrop(event);
         }, 30); //wait for 30ms before calling petDrop
     } else {
         if (dropAnimationId === undefined) {
-            diagnosticPrint(`interrupt.js line 47: logic error`);
+            diagnosticPrint(`interrupt.js line 49: Logic error`);
         } else {
             cancelAnimationFrame(dropAnimationId); //cancel the initial petDrop animation
             petDrop(event);
@@ -75,7 +65,6 @@ function petDrop(event) {
     let offset = 0;
     let newRight, newBottom;
     const dropSpeed = 0.2, limit = 20;
-    const currentBottom = petState.fromBottom;
     
 
     function dropAnimation(timestamp) {
@@ -86,7 +75,7 @@ function petDrop(event) {
 
         rect = img.getBoundingClientRect();
 
-        diagnosticPrint(`interrupt.js line 84: rect.bottom: ${rect.bottom}`);
+        diagnosticPrint(`interrupt.js line 78: rect.bottom: ${rect.bottom}`);
         newRight = document.documentElement.clientWidth - rect.right;
         newBottom = document.documentElement.clientHeight - rect.bottom;
 
@@ -95,7 +84,7 @@ function petDrop(event) {
             globalInterrupts.drop = false;
             img.style.bottom = `${newBottom}px`, img.style.right = `${newRight}px`;
             updatePosition(newBottom, newRight);
-            diagnosticPrint(`interrupt.js line 92: Completed petDrop`);
+            diagnosticPrint(`interrupt.js line 87: Completed petDrop`);
             return;
         } else {
             offset += dropSpeed * delta;

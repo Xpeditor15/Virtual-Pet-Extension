@@ -107,6 +107,7 @@ setTimeout(() => {
     const my_interval = setInterval(() => {
         if (!petState.isAction) {
             diagnosticPrint(`content.js line 109: Finish dropping initially`);
+            movementLoop();
             clearInterval(my_interval);
         }
     }, 50);

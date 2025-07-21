@@ -5,14 +5,15 @@ function petMove(distance) {
         const speedSettings = {
             idle: 0,
             swipe: 0,
-            walk: 0.1,
+            walk: 0.2,
             fast: 0.3, 
             run: 0.45
         }
 
         let speedValue = speedSettings[petState.speed];
 
-        if (!speedValue) {
+        if (speedValue === undefined) {
+            diagnosticPrint(`movement.js line 16: Error speed: ${petState.speed}`);
             petState.speed = 'idle';
             speedValue = speedSettings['idle'];
             diagnosticPrint(`movement.js line 18: Reset petState.speed to idle`);
@@ -40,7 +41,7 @@ function petMove(distance) {
 
                 autoUpdatePosition();
                 setImage(petState.speed, petState.direction);
-                diagnosticPrint(`movement.js line 42: Reached edge`);
+                diagnosticPrint(`movement.js line 42: Reached edge, changed direction to ${petState.direction}`);
             }
 
             if (petState.direction === 'left') offset -= speedValue;
@@ -84,13 +85,14 @@ function randomPetMovement() {
         if (speedIndex === -1) speedIndex = 0;
         const speeds = ['idle', 'walk', 'fast', 'run'];
 
-        const speed = speedArray[speedIndex];
+        const speed = speeds[speedIndex];
         petState.speed = speed;
 
         diagnosticPrint(`movement.js line 90: petState.speed: ${petState.speed}`);
 
         let direction = (randomDirection < 80) ? petState.direction : (petState.direction === 'left' ? 'right' : 'left');
         petState.direction = direction;
+        diagnosticPrint(`movement.js line 94: petState.direction: ${petState.direction}, petState.speed: ${petState.speed}`);
 
         const randomDistance = Math.floor(Math.random() * 150) + 250;
 
