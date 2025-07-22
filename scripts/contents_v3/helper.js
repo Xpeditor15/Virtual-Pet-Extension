@@ -1,7 +1,7 @@
-function terminateMovement(speed) { //resets petState and sets the image 
-    petState.speed = speed;
+function terminateMovement(oriSpeed, movementSpeed) { //resets petState and sets the image and applies the transformation
+    petState.speed = oriSpeed;
     petState.isAction = false;
-    setImage(petState.speed, petState.direction);
+    autoSetImage(oriSpeed, movementSpeed, petState.direction);
 }
 
 
@@ -25,9 +25,26 @@ function updatePosition(bottom, right) { //updates fromRight and fromBottom in p
     petState.fromRight = right;
 }
 
+
 function autoUpdatePosition() { //updates the position in petState without parameters given
     const rect = img.getBoundingClientRect();
     const right = document.documentElement.clientWidth - rect.right;
     const bottom = document.documentElement.clientHeight - rect.bottom;
     updatePosition(bottom, right);
+}
+
+
+function setTransformation(direction, speed) { //applies transformation onto the image
+    let directionStr, speedStr;
+    if (direction === 'left') directionStr = 'scaleX(-1)';
+    else directionStr = 'scaleX(1)';
+    
+    speedStr = `translateX(${speed}px)`;
+    img.style.transform = `${directionStr} ${speedStr}`;
+}
+
+
+function autoSetImage(imageSpeed, speed, direction) { //sets the image automatically and applies transformation
+    setImage(imageSpeed);
+    setTransformation(direction, speed);
 }

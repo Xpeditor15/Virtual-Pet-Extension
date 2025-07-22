@@ -20,6 +20,7 @@ function petMove(distance) {
         }
 
         setImage(petState.speed, petState.direction);
+        diagnosticPrint(`mvoement.js: setting direction to ${petState.direction}`);
 
         let offset = 0, counter = 0;
         

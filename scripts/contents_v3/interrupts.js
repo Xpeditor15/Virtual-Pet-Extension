@@ -18,6 +18,25 @@ function petSwipe() { //called in event listener click
 }
 
 
+function petSwipe() {
+    const tempSpeed = petState.speed;
+    petState.speed = 'swipe';
+
+    const swipeDuration = petList[userChoice]['swipeDuration'];
+    globalInterrupts.swipe = true;
+    petState.isAction = true;
+
+    autoSetImage('swipe', 0, petState.direction);
+
+    setTimeout(() => {
+        globalInterrupts.swipe = false;
+        terminateMovement(tempSpeed, 0);
+        diagnosticPrint(`interrupt.js line 16: Completed petSwipe`);
+    }, swipeDuration);
+
+}
+
+
 function petDrag(event) { //called in event listener dragend
     diagnosticPrint(`interrupt.js line 22: petDrag called`);
 

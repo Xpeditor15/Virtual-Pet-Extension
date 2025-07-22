@@ -1,6 +1,10 @@
 /* 
 Builds on contents_v2
 
+
+Changed: 
+setImage
+terminateMovement
 */
 
 
